@@ -17,7 +17,7 @@ let csvDText = 'Most Popular Singles Sold Digitally (Millions)';
 let csvChoice = csvPhysical;
 let csvText = csvPText;
 
-function option(choice) {
+function barChart(choice) {
     let margin = { top: 20, right: 20, bottom: 30, left: 40 },
         width = +svg.attr("width") - margin.left - margin.right,
         height = +svg.attr("height") - margin.top - margin.bottom;
@@ -105,18 +105,110 @@ function option(choice) {
             .text(csvText);
 
     }); // end d3.csv
-} // end function option
+} // end function barChart
+
+function scatterPlot(choice) {
+    let margin = { top: 20, right: 20, bottom: 30, left: 40 },
+        width = +svg.attr("width") - margin.left - margin.right,
+        height = +svg.attr("height") - margin.top - margin.bottom;
+
+    let div = d3.select("body").append("div")
+        .classed("tooltip", true)
+        .style("opacity", 0);
+
+    let g = svg.append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    if (choice === "physicalScatter") {
+        svg.classed("physical", true);
+        csvChoice = csvPhysical;
+        csvText = csvPText;
+    } else {
+        svg.classed("digitalScatter", true);
+        csvChoice = csvDigital;
+        csvText = csvDText;
+    }
+
+    d3.csv(csvChoice, function (d) {
+        d.sales = +d.sales;
+        d.released = +d.released;
+        return d;
+    }, function (error, data) {
+        if (error) throw error;
+
+        let xMin = d3.min(data, d => d.released);
+        let xMax = d3.max(data, d => d.released);
+        let yMin = d3.min(data, d => d.sales);
+        let yMax = d3.max(data, d => d.sales);
+
+        let xScale = d3.scaleLinear()
+            .domain([xMin, xMax])
+            .range([0, width]);
+
+        let yScale = d3.scaleLinear()
+            .domain([yMin, yMax])
+            .range([height, 0]);
+
+        let xAxis = d3.axisBottom(xScale)
+            .tickFormat(d3.format(".0f"))
+            .ticks(20, ".0f");
+
+        g.append("g")
+            .classed("axis axis--x", true)
+            .attr("transform", "translate(0," + height + ")")
+            .call(xAxis);
+
+        g.append("g")
+            .classed("axis axis--y", true)
+            .call(d3.axisLeft(yScale))
+
+        g.selectAll('.circle')
+            .data(data)
+            .enter()
+            .append('circle')
+            .classed("circle", true)
+            .attr('cx', d => xScale(d.released))
+            .attr('cy', d => yScale(d.sales))
+            .attr('r', d => 0.4 * d.sales)
+            .on("mouseover", d => {
+                div.transition()
+                    .duration(200)
+                    .style("opacity", .9);
+                div.html(`<strong>Artist:</strong> <span style='color:red'>${d.artist}</span><br><strong>Song:</strong> <span style='color:red'>${d.single}</span><br><strong>Year:</strong> <span style='color:red'>${d.released}</span><br><strong>Sales (mil):</strong> <span style='color:red'>${d.sales}</span><br>`)
+                    .style("left", (d3.event.pageX + 2) + "px")
+                    .style("top", (d3.event.pageY - 10) + "px");
+            })
+            .on("mouseout", d => {
+                div.transition()
+                    .duration(200)
+                    .style("opacity", 0);
+            });
+
+        g.append("text")
+            .attr("x", (width / 2))
+            .attr("y", 0 - (margin.top / 3))
+            .attr("text-anchor", "middle")
+            .style("font-size", "16px")
+            .text(csvText);
+
+    }); // end d3.csv
+} // end function scatterPlot
 
 d3.select("select").on("change", () => {
     let newVal = d3.select("select").property("value");
     d3.select("svg").selectAll("*").remove();
 
     if (newVal === "digital") {
-        option("digital");
-    } else {
-        option("physical");
+        barChart("digital");
+    } else if (newVal === "physical") {
+        barChart("physical");
+    } else if (newVal === "digitalScatter") {
+        scatterPlot("digitalScatter");
+    } else { // physicalScatter
+        scatterPlot("physicalScatter");
     }
 });
 
 // initial page load
-option("physical");
+barChart("physical");
+// scatterPlot("physicalScatter");
