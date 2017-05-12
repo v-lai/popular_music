@@ -1,5 +1,12 @@
 body {
     font: 12px Arial;
+    margin: 10vh auto;
+}
+
+div {
+    display: block;
+    margin: auto; 
+    text-align: center; 
 }
 
 .axis path,
