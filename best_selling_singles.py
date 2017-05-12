@@ -12,7 +12,7 @@ soup = bs4.BeautifulSoup(r.text, 'html.parser')
 # table_rows = soup.select(".wikitable")[10].select("tr") # use from [1-10] with csv flag 'a+'
 
 
-csv_data = [['artist', 'single', 'released', 'sales (millions)']]
+csv_data = [['artist', 'single', 'released', 'sales']]
 for row in table_rows[1:]:
     tds = row.select("td")
     artist = tds[0].text or tds[0].select("a")[0].text
