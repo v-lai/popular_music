@@ -32,7 +32,7 @@ var csvPText = 'Most Popular Singles Sold Physically (Millions)';
 var csvDigital = './music_digital.csv';
 var csvDText = 'Most Popular Singles Sold Digitally (Millions)';
 
-d3.csv(csvDigital, function (d) { // also swap commenting on title - line 91
+d3.csv(csvPhysical, function (d) { // also swap commenting on title - line 91
     d.sales = +d.sales;
     d.released = +d.released;
     return d;
@@ -88,6 +88,6 @@ d3.csv(csvDigital, function (d) { // also swap commenting on title - line 91
         .attr("y", 0 - (margin.top / 3))
         .attr("text-anchor", "middle")  
         .style("font-size", "16px")  
-        .text(csvDText);
+        .text(csvPText);
         
 }); // end d3.csv
