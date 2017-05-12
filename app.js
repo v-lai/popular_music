@@ -146,7 +146,7 @@ function scatterPlot(choice) {
             .range([0, width]);
 
         let yScale = d3.scaleLinear()
-            .domain([yMin, yMax])
+            .domain([0, yMax])
             .range([height, 0]);
 
         let xAxis = d3.axisBottom(xScale)
