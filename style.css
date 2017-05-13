@@ -28,10 +28,15 @@ div.tooltip {
     pointer-events: none;
 }
 
-.bar, .circle {
+.bar, .circle, .arc {
     fill: salmon;
 }
 
-.bar:hover, .circle:hover {
+.bar:hover, .circle:hover, .arc:hover {
     fill: magenta;
+}
+
+.arc {
+  stroke: #fff;
+  stroke-width: 1px;
 }

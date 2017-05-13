@@ -1,6 +1,6 @@
 // checking to see data from csv
 // let musicData = [];
-// d3.csv('./music.csv', function(d) { 
+// d3.csv('./music.csv', function (d) {
 //     // console.log(d);
 //     return musicData.push(d);
 // });
@@ -194,6 +194,83 @@ function scatterPlot(choice) {
     }); // end d3.csv
 } // end function scatterPlot
 
+
+function donutChart(choice) {
+    let margin = { top: 40 },
+        width = +svg.attr("width"),
+        height = +svg.attr("height") - margin.top;
+
+    let radius = Math.min(width, height) / 2;
+
+    let div = d3.select("body").append("div")
+        .classed("tooltip", true)
+        .style("opacity", 0);
+
+    var color = d3.scaleOrdinal(d3.schemeCategory20b);
+
+    if (choice === "physicalDonut") {
+        svg.classed("physicalDonut", true);
+        csvChoice = csvPhysical;
+        csvText = csvPText;
+    } else {
+        svg.classed("digitalDonut", true);
+        csvChoice = csvDigital;
+        csvText = csvDText;
+    }
+
+    d3.csv(csvChoice, function (d) {
+        d.sales = +d.sales;
+        // d.released = +d.released;
+        return d;
+    }, function (error, data) {
+        if (error) throw error;
+
+        let vis = svg.data([data])
+            .attr("width", width)
+            .attr("height", height)
+            .append("g")
+            .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+        let arc = d3.arc()
+            .innerRadius(radius - 80)
+            .outerRadius(radius - 10);
+
+        let pie = d3.pie()
+            .value(d => d.sales)
+            .sort(null);
+
+        let arcs = vis.selectAll(".arc")
+            .data(pie(data))
+            .enter().append("g")
+            .classed("arc", true);
+
+        arcs.append("path")
+            .attr("d", arc)
+            // .attr("fill", (d, i) => color(d.date.label))
+            .on("mouseover", d => {
+                div.transition()
+                    .duration(200)
+                    .style("opacity", .9);
+                div.html(`<strong>Artist:</strong> <span style='color:red'>${d.data.artist}</span><br><strong>Song:</strong> <span style='color:red'>${d.data.single}</span><br><strong>Year:</strong> <span style='color:red'>${d.data.released}</span><br><strong>Sales (mil):</strong> <span style='color:red'>${d.data.sales}</span><br>`)
+                    .style("left", (d3.event.pageX + 2) + "px")
+                    .style("top", (d3.event.pageY - 10) + "px");
+            })
+            .on("mouseout", d => {
+                div.transition()
+                    .duration(200)
+                    .style("opacity", 0);
+            });
+
+        svg.append("text")
+            .attr("x", (width / 2))
+            .attr("y", 0 + (margin.top/3))
+            .attr("text-anchor", "middle")
+            .style("font-size", "16px")
+            .text(csvText);
+
+    }); // end d3.csv
+} // end function donutChart
+
 d3.select("select").on("change", () => {
     let newVal = d3.select("select").property("value");
     d3.select("svg").selectAll("*").remove();
@@ -204,11 +281,14 @@ d3.select("select").on("change", () => {
         barChart("physical");
     } else if (newVal === "digitalScatter") {
         scatterPlot("digitalScatter");
-    } else { // physicalScatter
+    } else if (newVal === "physicalScatter") {
         scatterPlot("physicalScatter");
+    } else if (newVal === "digitalDonut") {
+        donutChart("digitalDonut");
+    } else {
+        donutChart("physicalDonut");
     }
 });
 
 // initial page load
 barChart("physical");
-// scatterPlot("physicalScatter");
