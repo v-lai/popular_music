@@ -1,12 +1,3 @@
-// checking to see data from csv
-// let musicData = [];
-// d3.csv('./music.csv', function (d) {
-//     // console.log(d);
-//     return musicData.push(d);
-// });
-// console.log(musicData)
-
-// d3 - bar chart
 let svg = d3.select("svg");
 
 // data from https://en.wikipedia.org/wiki/List_of_best-selling_singles
@@ -54,7 +45,7 @@ function barChart(choice) {
         if (error) throw error;
 
         x.domain(data.map(d => d.released));
-        y.domain([0, d3.max(data, (d) => d.sales)])
+        y.domain([0, d3.max(data, d => d.sales)])
 
         let barPadding = 1;
         let barWidth = width / data.length - barPadding;
@@ -66,18 +57,11 @@ function barChart(choice) {
         g.append("g")
             .classed("axis axis--y", true)
             .call(d3.axisLeft(y))
-        // for axis title (not showing up)
-        //   .append("text")
-        //     .attr("transform", "rotate(-90)")
-        //     .attr("y", 6)
-        //     .attr("dy", "0.71em")
-        //     .attr("text-anchor", "end")
-        //     .text("Sales (in millions)");
 
         g.selectAll(".bar")
             .data(data)
             .enter()
-            .append("rect")
+          .append("rect")
             .classed("bar", true)
             .attr("x", (d, i) => (barWidth + barPadding) * i + barPadding)
             .attr("y", d => y(d.sales))
@@ -165,7 +149,7 @@ function scatterPlot(choice) {
         g.selectAll('.circle')
             .data(data)
             .enter()
-            .append('circle')
+          .append('circle')
             .classed("circle", true)
             .attr('cx', d => xScale(d.released))
             .attr('cy', d => yScale(d.sales))
@@ -228,7 +212,7 @@ function donutChart(choice) {
         let vis = svg.data([data])
             .attr("width", width)
             .attr("height", height)
-            .append("g")
+          .append("g")
             .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
         let arc = d3.arc()
@@ -246,7 +230,6 @@ function donutChart(choice) {
 
         arcs.append("path")
             .attr("d", arc)
-            // .attr("fill", (d, i) => color(d.date.label))
             .on("mouseover", d => {
                 div.transition()
                     .duration(200)
